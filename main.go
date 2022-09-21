@@ -101,7 +101,9 @@ func lsTestFiles() []string {
 func extractTestFuncs(f *ast.File) []string {
 	fnList := make([]string, 0, len(f.FuncList))
 	for _, fn := range f.FuncList {
-		fnList = append(fnList, fn.Name)
+		if fn.IsTest {
+			fnList = append(fnList, fn.Name)
+		}
 	}
 	return fnList
 }
