@@ -32,9 +32,14 @@ func main() {
 		testList = append(testList, extractSuiteTestMethods(s)...)
 	}
 
+	if len(testList) == 0 {
+		println("no tests were found, exit...")
+		return
+	}
+
 	testName, ok := chooseTest(testList)
 	if !ok {
-		println("exit...")
+		println("no tests were chosen, exit...")
 		return
 	}
 
