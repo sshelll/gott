@@ -125,11 +125,12 @@ func (fp *fileParser) parseStructDecl(decl ast.Decl) *Struct {
 		// extract field type
 		if idt, ok := field.Type.(*ast.Ident); ok {
 			fieldInfo.TypeName = idt.Name
-		} else {
-			expr := field.Type.(*ast.SelectorExpr)
+		} else if expr, ok := field.Type.(*ast.SelectorExpr); ok {
 			pkg := expr.X.(*ast.Ident).Name
 			clz := expr.Sel.Name
 			fieldInfo.TypeName = pkg + "." + clz
+		} else {
+			continue
 		}
 
 		structInfo.FieldList = append(structInfo.FieldList, fieldInfo)
