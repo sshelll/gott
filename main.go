@@ -17,7 +17,7 @@ func main() {
 
 	f, ok := chooseFile()
 	if !ok {
-		println("exit...")
+		println("no files were chosen, exit...")
 		return
 	}
 
@@ -56,20 +56,26 @@ func main() {
 }
 
 func chooseFile() (fname string, ok bool) {
-	_, v, ok := buildScreen().
-		SetTitle("GO TEST FILES").
-		SetLines(lsTestFiles()...).
+	testFiles := lsTestFiles()
+	if len(testFiles) == 0 {
+		return
+	}
+	screen := buildScreen()
+	defer screen.Fini()
+	_, fname, ok = screen.SetTitle("GO TEST FILES").
+		SetLines(testFiles...).
 		Start().
 		ChosenLine()
 	if ok {
-		v = "./" + v
+		fname = "./" + fname
 	}
-	return v, ok
+	return
 }
 
 func chooseTest(testList []string) (tname string, ok bool) {
-	_, v, ok := buildScreen().
-		SetTitle("GO TEST LIST").
+	screen := buildScreen()
+	defer screen.Fini()
+	_, v, ok := screen.SetTitle("GO TEST LIST").
 		SetLines(testList...).
 		Start().
 		ChosenLine()
@@ -78,7 +84,7 @@ func chooseTest(testList []string) (tname string, ok bool) {
 
 func buildScreen() *menuscreen.MenuScreen {
 	screen, err := menuscreen.NewMenuScreen()
-	if err != nil {
+	if err != nil || screen == nil {
 		log.Fatalf("init screen controller failed: %v\n", err)
 	}
 	return screen
