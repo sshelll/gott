@@ -183,7 +183,7 @@ func (fp *fileParser) isTestFunc(fDecl *ast.FuncDecl) bool {
 
 	params := fDecl.Type.Params
 
-	if params == nil && len(params.List) != 1 {
+	if params == nil || len(params.List) != 1 {
 		return false
 	}
 
