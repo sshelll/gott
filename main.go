@@ -42,6 +42,7 @@ func main() {
 	if len(os.Args) > 1 {
 		for i := 1; i < len(os.Args); i++ {
 			args.WriteString(os.Args[i])
+			args.WriteString(" ")
 		}
 	}
 
