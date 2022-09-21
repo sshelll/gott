@@ -5,6 +5,7 @@ import (
 	"go/parser"
 	"go/token"
 	"path/filepath"
+	"strings"
 )
 
 type fileParser struct {
@@ -180,6 +181,10 @@ func (fp *fileParser) parseFuncDecl(decl ast.Decl) (method *Method, fn *Func) {
 }
 
 func (fp *fileParser) isTestFunc(fDecl *ast.FuncDecl) bool {
+
+	if !strings.HasPrefix(fDecl.Name.Name, "Test") {
+		return false
+	}
 
 	params := fDecl.Type.Params
 

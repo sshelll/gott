@@ -51,3 +51,11 @@ func (*BarTestSuite) TestCase1() {
 func (*BarTestSuite) TestCase2() {
 
 }
+
+func (*BarTestSuite) OtherFunc() {
+
+}
+
+func (*BarTestSuite) privateFunc() {
+
+}

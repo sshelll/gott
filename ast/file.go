@@ -2,6 +2,7 @@ package ast
 
 import (
 	"fmt"
+	"strings"
 )
 
 type File struct {
@@ -77,6 +78,10 @@ func (m *Method) Print() {
 	} else {
 		fmt.Printf("Method: (recv %s) %s(...)\n", m.TypeName, m.Name)
 	}
+}
+
+func (m *Method) IsTest() bool {
+	return m != nil && strings.HasPrefix(m.Name, "Test")
 }
 
 func (fn *Func) Print() {

@@ -140,7 +140,9 @@ func extractSuiteTestMethods(s *ast.Struct) []string {
 	suiteName := s.Name
 	methodList := make([]string, 0, len(s.MethodList))
 	for _, m := range s.MethodList {
-		methodList = append(methodList, fmt.Sprintf("%s/%s", suiteName, m.Name))
+		if m.IsTest() {
+			methodList = append(methodList, fmt.Sprintf("%s/%s", suiteName, m.Name))
+		}
 	}
 	return methodList
 }
