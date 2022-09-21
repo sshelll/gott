@@ -152,6 +152,11 @@ func (fp *fileParser) parseFuncDecl(decl ast.Decl) (method *Method, fn *Func) {
 			Name:   fDecl.Name.Name,
 			IsTest: fp.isTestFunc(fDecl),
 		}
+		if fn.IsTest {
+			suiteName, isSuiteEntry := fp.isSuiteEntry(fDecl)
+			fn.IsSuiteEntry = isSuiteEntry
+			fn.SuiteName = suiteName
+		}
 		return
 	}
 
@@ -192,6 +197,11 @@ func (fp *fileParser) isTestFunc(fDecl *ast.FuncDecl) bool {
 		return false
 	}
 
+	tname := params.List[0].Names
+	if len(tname) != 1 {
+		return false
+	}
+
 	starExpr, ok := params.List[0].Type.(*ast.StarExpr)
 	if !ok {
 		return false
@@ -213,5 +223,82 @@ func (fp *fileParser) isTestFunc(fDecl *ast.FuncDecl) bool {
 	}
 
 	return false
+
+}
+
+func (fp *fileParser) isSuiteEntry(fDecl *ast.FuncDecl) (suiteName string, isOK bool) {
+
+	if !fp.isTestFunc(fDecl) {
+		return "", false
+	}
+
+	tName := fDecl.Type.Params.List[0].Names[0].Name
+
+	if fDecl.Body == nil {
+		return "", false
+	}
+
+	if fDecl.Body == nil {
+		return "", false
+	}
+
+	for _, stmt := range fDecl.Body.List {
+		exprStmt, ok := stmt.(*ast.ExprStmt)
+		if !ok {
+			continue
+		}
+		if exprStmt.X == nil {
+			continue
+		}
+		callExpr, ok := exprStmt.X.(*ast.CallExpr)
+		if !ok {
+			continue
+		}
+		if callExpr.Fun == nil || len(callExpr.Args) != 2 {
+			continue
+		}
+		selectorExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
+		if !ok {
+			continue
+		}
+		// TODO: add pkg name judgement
+		if selectorExpr.Sel == nil || selectorExpr.Sel.Name != "Run" {
+			continue
+		}
+		if len(callExpr.Args) != 2 {
+			continue
+		}
+		idt, ok := callExpr.Args[0].(*ast.Ident)
+		if !ok {
+			continue
+		}
+		if idt.Name != tName {
+			continue
+		}
+		// parse new(suite)
+		if callNewExpr, ok := callExpr.Args[1].(*ast.CallExpr); ok {
+			idt, ok := callNewExpr.Fun.(*ast.Ident)
+			if ok && idt.Name == "new" {
+				structIdt, ok := callNewExpr.Args[0].(*ast.Ident)
+				if ok {
+					return structIdt.Name, true
+				}
+			}
+		}
+		// parse &suite{}
+		if unaryExpr, ok := callExpr.Args[1].(*ast.UnaryExpr); ok {
+			if unaryExpr.Op == token.AND {
+				compositeLit, ok := unaryExpr.X.(*ast.CompositeLit)
+				if ok {
+					idt, isIdt := compositeLit.Type.(*ast.Ident)
+					if isIdt {
+						return idt.Name, true
+					}
+				}
+			}
+		}
+	}
+
+	return "", false
 
 }

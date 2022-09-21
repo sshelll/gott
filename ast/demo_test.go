@@ -15,7 +15,7 @@ type FooTestSuite struct {
 }
 
 func TestFoo(t *testing.T) {
-	suite.Run(t, new(FooTestSuite))
+	suite.Run(t, &FooTestSuite{})
 }
 
 func (s *FooTestSuite) BeforeTest(suiteName, testName string) {

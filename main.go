@@ -28,9 +28,7 @@ func main() {
 
 	testList := make([]string, 0, 16)
 	testList = append(testList, extractTestFuncs(fInfo)...)
-	for _, s := range extractTestSuites(fInfo) {
-		testList = append(testList, extractSuiteTestMethods(s)...)
-	}
+	testList = append(testList, extractSuiteTestMethods(fInfo)...)
 
 	if len(testList) == 0 {
 		println("no tests were found, exit...")
@@ -85,6 +83,9 @@ func chooseTest(testList []string) (tname string, ok bool) {
 		SetLines(testList...).
 		Start().
 		ChosenLine()
+	if ok {
+		v = "^" + v + "$"
+	}
 	return v, ok
 }
 
@@ -120,34 +121,28 @@ func extractTestFuncs(f *ast.File) []string {
 	return fnList
 }
 
-func extractTestSuites(f *ast.File) []*ast.Struct {
-	if f == nil {
-		return nil
+func extractSuiteTestMethods(f *ast.File) []string {
+
+	suiteEntryMap := make(map[string]string)
+	for _, fn := range f.FuncList {
+		if fn.IsSuiteEntry {
+			suiteEntryMap[fn.SuiteName] = fn.Name
+		}
 	}
-	sList := make([]*ast.Struct, 0, len(f.StructList))
-	for i, s := range f.StructList {
-		if s == nil {
+
+	methodList := make([]string, 0, 16)
+	for _, s := range f.StructList {
+		entryName, ok := suiteEntryMap[s.Name]
+		if !ok {
 			continue
 		}
-		for _, field := range s.FieldList {
-			if field.TypeName == "suite.Suite" {
-				sList = append(sList, f.StructList[i])
+		for _, m := range s.MethodList {
+			if m.IsTest() {
+				methodList = append(methodList, fmt.Sprintf("%s/%s", entryName, m.Name))
 			}
 		}
 	}
-	return sList
-}
 
-func extractSuiteTestMethods(s *ast.Struct) []string {
-	if s == nil {
-		return nil
-	}
-	suiteName := s.Name
-	methodList := make([]string, 0, len(s.MethodList))
-	for _, m := range s.MethodList {
-		if m.IsTest() {
-			methodList = append(methodList, fmt.Sprintf("%s/%s", suiteName, m.Name))
-		}
-	}
 	return methodList
+
 }

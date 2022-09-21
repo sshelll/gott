@@ -29,8 +29,10 @@ type Method struct {
 }
 
 type Func struct {
-	Name   string
-	IsTest bool
+	Name         string
+	IsTest       bool
+	IsSuiteEntry bool
+	SuiteName    string
 }
 
 func (f *File) Print() {
