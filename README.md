@@ -21,5 +21,7 @@ go version <= 1.16 可前往 Github Release 页面下载打包好的可执行文
 例如:
 
 `go test -v` => `gott -v`
+
 `go test -v -race` => `gott -v -race`
+
 `go test -gcflags=all=-l -race -coverprofile=coverage.out` => `gott -gcflags=all=-l -race -coverprofile=coverage.out`
