@@ -51,12 +51,11 @@ func main() {
 
 	gotestCmd := fmt.Sprintf("go test %s -test.run %s", args.String(), testName)
 	cmd := exec.Command("bash", "-c", gotestCmd)
-	out, err := cmd.Output()
-	if err != nil {
-		log.Fatalf("get exec output failed: %v\n", err)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		log.Fatalf("exec cmd '%s' failed, err = %v\n", cmd.String(), err)
 	}
-	println(string(out))
-
 }
 
 func chooseFile() (fname string, ok bool) {
