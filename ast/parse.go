@@ -9,15 +9,17 @@ import (
 )
 
 type fileParser struct {
-	path    string
-	absPath string
-	fset    *token.FileSet
-	astf    *ast.File
+	path            string
+	absPath         string
+	testifyPkgAlias string
+	fset            *token.FileSet
+	astf            *ast.File
 }
 
 func NewFileParser(path string) *fileParser {
 	return &fileParser{
-		path: path,
+		testifyPkgAlias: "suite",
+		path:            path,
 	}
 }
 
@@ -31,24 +33,35 @@ func (fp *fileParser) Parse() (*File, error) {
 		Path: fp.absPath,
 	}
 
-	tDecls, fDecls := fp.extractStructAndFunc()
+	pDecls, tDecls, fDecls := fp.extractAstDecls()
 
-	var (
-		funcList        []*Func
-		structMethodMap map[string][]*Method = make(map[string][]*Method)
-	)
+	// handle imports
+	for _, pDecl := range pDecls {
+		file.ImportList = append(file.ImportList, fp.parseImportDecl(pDecl)...)
+	}
 
+	for _, imp := range file.ImportList {
+		if imp.Pkg != `"github.com/stretchr/testify/suite"` {
+			continue
+		}
+		if len(strings.TrimSpace(imp.Alias)) > 0 {
+			fp.testifyPkgAlias = imp.Alias
+		}
+	}
+
+	structMethodMap := make(map[string][]*Method)
+	// handle funcs
 	for _, fDecl := range fDecls {
 		m, f := fp.parseFuncDecl(fDecl)
 		if m != nil {
 			structMethodMap[m.TypeName] = append(structMethodMap[m.TypeName], m)
 		}
 		if f != nil {
-			funcList = append(funcList, f)
+			file.FuncList = append(file.FuncList, f)
 		}
 	}
-	file.FuncList = funcList
 
+	// handle structs
 	for _, tDecl := range tDecls {
 		structInfo := fp.parseStructDecl(tDecl)
 		if structInfo != nil {
@@ -72,7 +85,7 @@ func (fp *fileParser) parseAST() error {
 	return err
 }
 
-func (fp *fileParser) extractStructAndFunc() (structs, funcs []ast.Decl) {
+func (fp *fileParser) extractAstDecls() (imports, structs, funcs []ast.Decl) {
 
 	if fp.astf == nil {
 		return
@@ -87,10 +100,42 @@ func (fp *fileParser) extractStructAndFunc() (structs, funcs []ast.Decl) {
 			structs = append(structs, decl)
 		}
 
+		if ok && gDecl.Tok == token.IMPORT {
+			imports = append(imports, decl)
+		}
+
 		if _, ok = decl.(*ast.FuncDecl); ok {
 			funcs = append(funcs, decl)
 		}
 
+	}
+
+	return
+
+}
+
+func (fp *fileParser) parseImportDecl(decl ast.Decl) (importList []*Import) {
+
+	specList := decl.(*ast.GenDecl).Specs
+
+	if len(specList) == 0 {
+		return
+	}
+
+	importList = make([]*Import, 0, len(specList))
+
+	for _, spec := range specList {
+		pSpec, ok := spec.(*ast.ImportSpec)
+		if !ok {
+			continue
+		}
+		imp := &Import{
+			Pkg: pSpec.Path.Value,
+		}
+		if name := pSpec.Name; name != nil {
+			imp.Alias = name.Name
+		}
+		importList = append(importList, imp)
 	}
 
 	return
@@ -153,7 +198,7 @@ func (fp *fileParser) parseFuncDecl(decl ast.Decl) (method *Method, fn *Func) {
 			IsTest: fp.isTestFunc(fDecl),
 		}
 		if fn.IsTest {
-			suiteName, isSuiteEntry := fp.isSuiteEntry(fDecl)
+			suiteName, isSuiteEntry := fp.isSuiteEntryFunc(fDecl)
 			fn.IsSuiteEntry = isSuiteEntry
 			fn.SuiteName = suiteName
 		}
@@ -226,7 +271,7 @@ func (fp *fileParser) isTestFunc(fDecl *ast.FuncDecl) bool {
 
 }
 
-func (fp *fileParser) isSuiteEntry(fDecl *ast.FuncDecl) (suiteName string, isOK bool) {
+func (fp *fileParser) isSuiteEntryFunc(fDecl *ast.FuncDecl) (suiteName string, isOK bool) {
 
 	if !fp.isTestFunc(fDecl) {
 		return "", false
@@ -243,6 +288,7 @@ func (fp *fileParser) isSuiteEntry(fDecl *ast.FuncDecl) (suiteName string, isOK 
 	}
 
 	for _, stmt := range fDecl.Body.List {
+
 		exprStmt, ok := stmt.(*ast.ExprStmt)
 		if !ok {
 			continue
@@ -261,7 +307,12 @@ func (fp *fileParser) isSuiteEntry(fDecl *ast.FuncDecl) (suiteName string, isOK 
 		if !ok {
 			continue
 		}
-		// TODO: add pkg name judgement
+		if selectorExpr.X == nil {
+			continue
+		}
+		if idt, ok := selectorExpr.X.(*ast.Ident); !ok || idt.Name != fp.testifyPkgAlias {
+			continue
+		}
 		if selectorExpr.Sel == nil || selectorExpr.Sel.Name != "Run" {
 			continue
 		}

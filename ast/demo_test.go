@@ -4,18 +4,18 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/suite"
+	testifySuite "github.com/stretchr/testify/suite"
 )
 
 type DummyInt int
 
 type FooTestSuite struct {
-	suite.Suite
+	testifySuite.Suite
 	Ctx context.Context
 }
 
 func TestFoo(t *testing.T) {
-	suite.Run(t, &FooTestSuite{})
+	testifySuite.Run(t, &FooTestSuite{})
 }
 
 func (s *FooTestSuite) BeforeTest(suiteName, testName string) {
@@ -31,13 +31,14 @@ func (FooTestSuite) TestCase2() {
 }
 
 type BarTestSuite struct {
-	suite.Suite
+	testifySuite.Suite
 	Ctx    context.Context
 	S1, S2 string
 }
 
 func TestBar(t *testing.T) {
-	suite.Run(t, new(BarTestSuite))
+	tt := new(BarTestSuite)
+	testifySuite.Run(t, tt)
 }
 
 func (s *BarTestSuite) BeforeTest(suiteName, testName string) {

@@ -7,8 +7,14 @@ import (
 
 type File struct {
 	Path       string
+	ImportList []*Import
 	StructList []*Struct
 	FuncList   []*Func
+}
+
+type Import struct {
+	Alias string
+	Pkg   string
 }
 
 type Struct struct {
@@ -38,6 +44,10 @@ type Func struct {
 func (f *File) Print() {
 	fmt.Println("-----------------------------")
 	fmt.Printf("********* File Path *********\n%s\n", f.Path)
+	fmt.Println("********* Import List *********")
+	for _, imp := range f.ImportList {
+		imp.Print()
+	}
 	fmt.Println("********* Func List *********")
 	for _, fn := range f.FuncList {
 		fn.Print()
@@ -48,6 +58,13 @@ func (f *File) Print() {
 		fmt.Println()
 	}
 	fmt.Println("-----------------------------")
+}
+
+func (i *Import) Print() {
+	if i == nil {
+		return
+	}
+	fmt.Printf("Alias: %s, Pkg: %s\n", i.Alias, i.Pkg)
 }
 
 func (s *Struct) Print() {
