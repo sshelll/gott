@@ -32,30 +32,30 @@ go version <= 1.16 可前往 Github Release 页面下载打包好的可执行文
 
   ```go
   type FooTestSuite struct {
-  		suite.Suite
+    suite.Suite
   }
   
   // OK, allow 'new'
   func TestFoo1(t *testing.T) {
-    	suite.Run(t, new(FooTestSuite)) 
+    suite.Run(t, new(FooTestSuite)) 
   }
   
   // OK, allow '&'
   func TestFoo2(t *testing.T) {
-    	suite.Run(t, &FooTestSuite{})
+    suite.Run(t, &FooTestSuite{})
   }
   
   // not OK
   func TestFoo3(t *testing.T) {
-  	  foo := new(FooTestSuite)
-    	suite.Run(t, foo)
+    foo := new(FooTestSuite)
+    suite.Run(t, foo)
   }
   
   // not OK
   func TestFoo4(t *testing.T) {
-    	m := make(map[int]interface{})
-    	m[1] = &FooTestSuite{}
-  	  suite.Run(t, m[1])
+    m := make(map[int]interface{})
+    m[1] = &FooTestSuite{}
+    suite.Run(t, m[1])
   }
   ```
 
