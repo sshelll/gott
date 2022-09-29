@@ -1,7 +1,8 @@
-package ast
+package util
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	testifySuite "github.com/stretchr/testify/suite"
@@ -9,9 +10,18 @@ import (
 
 type DummyInt int
 
+func (d DummyInt) IntVal() int {
+	return int(d)
+}
+
+func (d DummyInt) String() string {
+	return fmt.Sprintf("%d", d)
+}
+
 type FooTestSuite struct {
 	testifySuite.Suite
 	Ctx context.Context
+	BarTestSuite
 }
 
 func TestFoo(t *testing.T) {

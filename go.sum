@@ -1,5 +1,7 @@
 github.com/SCU-SJL/menuscreen v1.0.5 h1:FtHCwAz1X2+ARkDLNwAExOL9dP3cG1Oe6o2GE9Hqd2c=
 github.com/SCU-SJL/menuscreen v1.0.5/go.mod h1:QKgh3fipWD0QoKaK4uOCcBEzD9JHIeHw/1kJ5IfwML8=
+github.com/SCU-SJL/sinfra v0.0.0-20220929071109-a4dc7f29ae01 h1:ADnMkGw6I1qljnquHC7l6w+i47kuEsxdSf2rla/ek1s=
+github.com/SCU-SJL/sinfra v0.0.0-20220929071109-a4dc7f29ae01/go.mod h1:XwUF7sDaxXVenviJGFMHDRh47wa49ERWQcQu1teL1RI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
