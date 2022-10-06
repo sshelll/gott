@@ -13,7 +13,7 @@ import (
 
 func main() {
 
-	if len(os.Args) > 1 && os.Args[1] == "-h" || os.Args[1] == "--help" {
+	if len(os.Args) > 1 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
 		println("use -p to print test func name only, or else gott would exec 'go test'")
 		return
 	}
