@@ -13,6 +13,11 @@ import (
 
 func main() {
 
+	if len(os.Args) > 1 && os.Args[1] == "-h" || os.Args[1] == "--help" {
+		println("use -p to print test func name only, or else gott would exec 'go test'")
+		return
+	}
+
 	f, ok := util.ChooseTestFile()
 	if !ok {
 		println("[gott] no files were chosen, exit...")
@@ -37,6 +42,17 @@ func main() {
 		return
 	}
 
+	if len(os.Args) > 1 && os.Args[1] == "-p" {
+		println(testName)
+		return
+	}
+
+	execGoTest(testName)
+
+}
+
+func execGoTest(testName string) {
+
 	args := bytes.Buffer{}
 	if len(os.Args) > 1 {
 		for i := 1; i < len(os.Args); i++ {
@@ -45,10 +61,19 @@ func main() {
 		}
 	}
 
-	gotestCmd := fmt.Sprintf("go test %s -test.run %s", args.String(), testName)
-	cmd := exec.Command("bash", "-c", gotestCmd)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	goTestCmd := fmt.Sprintf("go test %s -test.run %s", args.String(), testName)
+	execCmd(goTestCmd, true)
+
+}
+
+func execCmd(sh string, useStdIO bool) {
+
+	cmd := exec.Command("bash", "-c", sh)
+	if useStdIO {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
+
 	if err := cmd.Run(); err != nil {
 		log.Fatalf("[gott] exec cmd '%s' failed, err = %v\n", cmd.String(), err)
 	}
