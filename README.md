@@ -16,6 +16,8 @@ go version <= 1.16 可前往 Github Release 页面下载打包好的可执行文
 
 在任意目录下直接使用 `gott` 来替换 `go test` 即可
 
+或者使用 `gott -p` 来获取单测名称但不执行 `go test`
+
 例如:
 
 `go test -v` => `gott -v`
@@ -23,6 +25,8 @@ go version <= 1.16 可前往 Github Release 页面下载打包好的可执行文
 `go test -v -race` => `gott -v -race`
 
 `go test -gcflags=all=-l -race -coverprofile=coverage.out` => `gott -gcflags=all=-l -race -coverprofile=coverage.out`
+
+`gott -p` => `you will get a go test func name`
 
 ## QA
 
