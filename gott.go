@@ -29,7 +29,7 @@ func main() {
 		log.Fatalln("[gott] ast parse failed:", err.Error())
 	}
 
-	testList := append(util.ExtractTestFuncs(fInfo), util.ExtractTestifySuiteEntryFuncs(fInfo)...)
+	testList := append(util.ExtractTestFuncs(fInfo), util.ExtractTestifySuiteTestMethods(fInfo)...)
 
 	if len(testList) == 0 {
 		println("[gott] no tests were found, exit...")

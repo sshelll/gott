@@ -12,6 +12,6 @@ func TestExtractFuncs(t *testing.T) {
 	assert.Nil(t, err)
 	testList := make([]string, 0, 16)
 	testList = append(testList, ExtractTestFuncs(f)...)
-	testList = append(testList, ExtractTestifySuiteEntryFuncs(f)...)
+	testList = append(testList, ExtractTestifySuiteTestMethods(f)...)
 	assert.NotZero(t, len(testList))
 }

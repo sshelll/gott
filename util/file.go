@@ -23,7 +23,7 @@ func ExtractTestFuncs(f *ast.File) []string {
 	return fnList
 }
 
-func ExtractTestifySuiteEntryFuncs(f *ast.File) []string {
+func ExtractTestifySuiteTestMethods(f *ast.File) []string {
 
 	testingPkg := findTestingPkgName(f.ImportList)
 	testifyPkg := findTestifyPkgName(f.ImportList)
