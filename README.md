@@ -14,7 +14,7 @@ go version <= 1.16 可前往 Github Release 页面下载打包好的可执行文
 
 ## Usage
 
-在任意目录下直接使用 `gott` 来替换 `go test` 即可
+**在任意目录下直接使用 `gott` 来替换 `go test` 即可**
 
 或者使用 `gott -p` 来获取单测名称但不执行 `go test`
 
@@ -24,9 +24,23 @@ go version <= 1.16 可前往 Github Release 页面下载打包好的可执行文
 
 `go test -v -race` => `gott -v -race`
 
+`go test -gcflags="all=-l -N"` => `gott -gcflags=\"all=-l -N\"`
+
 `go test -gcflags=all=-l -race -coverprofile=coverage.out` => `gott -gcflags=all=-l -race -coverprofile=coverage.out`
 
 `gott -p` => `you will get a go test func name`
+
+**使用以下脚本可以配合 dlv 实现 debug 指定单测:**
+
+```sh
+#!/bin/zsh
+
+fn=$(gott -p)
+
+if [ ! $fn ]; then exit 0; fi
+
+dlv test --build-flags=-test.run $fn
+```
 
 ## QA
 
