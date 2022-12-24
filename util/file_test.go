@@ -3,7 +3,7 @@ package util
 import (
 	"testing"
 
-	"github.com/SCU-SJL/sinfra/ast"
+	"github.com/sshelll/sinfra/ast"
 	"github.com/stretchr/testify/assert"
 )
 

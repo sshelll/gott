@@ -7,8 +7,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/SCU-SJL/gott/util"
-	"github.com/SCU-SJL/sinfra/ast"
+	"github.com/sshelll/gott/util"
+	"github.com/sshelll/sinfra/ast"
 )
 
 func main() {

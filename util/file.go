@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SCU-SJL/sinfra/ast"
+	"github.com/sshelll/sinfra/ast"
 )
 
 const (

@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/SCU-SJL/menuscreen"
+	"github.com/sshelll/menuscreen"
 )
 
 func ChooseTestFile() (file string, ok bool) {
