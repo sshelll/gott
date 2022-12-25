@@ -1,4 +1,5 @@
 # Gott
+
 <a href="https://996.icu"><img src="https://img.shields.io/badge/link-996.icu-red.svg" alt="996.icu" /></a>
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 
@@ -9,7 +10,7 @@
 go version >= 1.17，git clone 当前 repo 并执行 `go build` 即可，或是直接使用下方命令：
 
 ```sh
-go install github.com/SCU-SJL/gott/@latest
+go install github.com/sshelll/gott/@latest
 ```
 
 go version <= 1.16 可前往 Github Release 页面下载打包好的可执行文件(MacOS Only)
@@ -54,23 +55,23 @@ dlv test --build-flags=-test.run $fn
   type FooTestSuite struct {
     suite.Suite
   }
-  
+
   // OK, allow 'new'
   func TestFoo1(t *testing.T) {
-    suite.Run(t, new(FooTestSuite)) 
+    suite.Run(t, new(FooTestSuite))
   }
-  
+
   // OK, allow '&'
   func TestFoo2(t *testing.T) {
     suite.Run(t, &FooTestSuite{})
   }
-  
+
   // not OK
   func TestFoo3(t *testing.T) {
     foo := new(FooTestSuite)
     suite.Run(t, foo)
   }
-  
+
   // not OK
   func TestFoo4(t *testing.T) {
     m := make(map[int]interface{})
@@ -78,8 +79,6 @@ dlv test --build-flags=-test.run $fn
     suite.Run(t, m[1])
   }
   ```
-
-  
 
 - Q2：菜单常用按键映射？
 
