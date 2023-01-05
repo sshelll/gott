@@ -8,6 +8,10 @@ import (
 	"github.com/sshelll/menuscreen"
 )
 
+const (
+	TestAllOption = "→TEST ALL!"
+)
+
 func ChooseTestFile() (file string, ok bool) {
 	testFiles := lsTestFiles()
 	if len(testFiles) == 0 {
@@ -25,17 +29,21 @@ func ChooseTestFile() (file string, ok bool) {
 	return
 }
 
-func ChooseTest(testList []string) (tname string, ok bool) {
+func ChooseTest(testList []string) (tname string, testAll, ok bool) {
 	screen := buildScreen()
 	defer screen.Fini()
-	_, v, ok := screen.SetTitle("GO TEST LIST").
+	_, tname, ok = screen.SetTitle("GO TEST LIST").
 		SetLines(testList...).
+		AppendLines(TestAllOption).
 		Start().
 		ChosenLine()
-	if ok {
-		v = "^" + v + "$"
+	if tname == TestAllOption {
+		return tname, true, true
 	}
-	return v, ok
+	if ok {
+		tname = "^" + tname + "$"
+	}
+	return
 }
 
 func lsTestFiles() []string {

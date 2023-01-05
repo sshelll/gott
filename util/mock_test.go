@@ -18,6 +18,10 @@ func (d DummyInt) String() string {
 	return fmt.Sprintf("%d", d)
 }
 
+func TestXxx(t *testing.T) {
+	println("hello world")
+}
+
 type FooTestSuite struct {
 	testifySuite.Suite
 	Ctx context.Context
@@ -47,6 +51,10 @@ type BarTestSuite struct {
 }
 
 func TestBar(t *testing.T) {
+	// gott is not smart enough to recognize this kind of code...
+	// you have to use call Run() directly, for example:
+	// testifySuite.Run(t, &BarTestSuite{})
+	// testifySuite.Run(t, new(BarTestSuite))
 	tt := new(BarTestSuite)
 	testifySuite.Run(t, tt)
 }
