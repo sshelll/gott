@@ -4,12 +4,11 @@ go 1.19
 
 require (
 	github.com/sshelll/menuscreen v1.0.11
-	github.com/sshelll/sinfra v0.0.0-20221224191935-a1dedf2c6469
+	github.com/sshelll/sinfra v0.0.0-20230105131211-5b1902ccbc20
 	github.com/stretchr/testify v1.8.1
 )
 
 require (
-	github.com/SCU-SJL/sinfra v0.0.0-20221224185845-7cd64718267a // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
 	github.com/gdamore/tcell/v2 v2.5.3 // indirect
