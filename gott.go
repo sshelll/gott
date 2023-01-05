@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/sshelll/gott/util"
 	"github.com/sshelll/sinfra/ast"
@@ -29,17 +30,22 @@ func main() {
 		log.Fatalln("[gott] ast parse failed:", err.Error())
 	}
 
-	testList := append(util.ExtractTestFuncs(fInfo), util.ExtractTestifySuiteTestMethods(fInfo)...)
+	goTests, testifyTests := util.ExtractTestFuncs(fInfo), util.ExtractTestifySuiteTestMethods(fInfo)
+	testList := append(goTests, testifyTests...)
 
 	if len(testList) == 0 {
 		println("[gott] no tests were found, exit...")
 		return
 	}
 
-	testName, ok := util.ChooseTest(testList)
+	testName, testAll, ok := util.ChooseTest(testList)
 	if !ok {
 		println("[gott] no tests were chosen, exit...")
 		return
+	}
+
+	if testAll {
+		testName = buildTestAllExpr(goTests)
 	}
 
 	if len(os.Args) > 1 && os.Args[1] == "-p" {
@@ -49,6 +55,20 @@ func main() {
 
 	execGoTest(testName)
 
+}
+
+func buildTestAllExpr(testList []string) string {
+	buf := strings.Builder{}
+	cnt := len(testList)
+	for i, testName := range testList {
+		buf.WriteString("^")
+		buf.WriteString(testName)
+		buf.WriteString("$")
+		if i < cnt-1 {
+			buf.WriteString("\\|")
+		}
+	}
+	return buf.String()
 }
 
 func execGoTest(testName string) {
