@@ -58,8 +58,10 @@ func main() {
 }
 
 func buildTestAllExpr(testList []string) string {
+
 	buf := strings.Builder{}
 	cnt := len(testList)
+
 	for i, testName := range testList {
 		buf.WriteString("^")
 		buf.WriteString(testName)
@@ -68,7 +70,9 @@ func buildTestAllExpr(testList []string) string {
 			buf.WriteString("\\|")
 		}
 	}
+
 	return buf.String()
+
 }
 
 func execGoTest(testName string) {
