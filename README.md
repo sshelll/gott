@@ -5,6 +5,10 @@
 
 可视化指定固定单测执行的命令行工具
 
+## Demo
+
+<img src="gif/demo.gif" alt="demo" width=50%>
+
 ## Install
 
 go version >= 1.17，git clone 当前 repo 并执行 `go build` 即可，或是直接使用下方命令：
