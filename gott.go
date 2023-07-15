@@ -1,28 +1,86 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
-	"strings"
 
 	"github.com/sshelll/gott/util"
 	"github.com/sshelll/sinfra/ast"
 )
 
+// lua print(require'util'.get_pos_under_cursor())
+// lua print(require'gott'.get_test_name('/Users/shaojiale/Codes/github/mine/gott/util/mock_test.go', 423))
+
 func main() {
+	var (
+		testName string
+		done     bool
+	)
 
-	if len(os.Args) > 1 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
-		println("use -p to print test func name only, or else gott would exec 'go test'")
+	switch true {
+	// help
+	case len(os.Args) == 2 && (os.Args[1] == "-h" || os.Args[1] == "--help"):
+		helpMode()
 		return
-	}
 
+	// pos
+	case len(os.Args) > 1 && os.Args[1] == "--pos":
+		testName, done = posMode()
+		if done {
+			return
+		}
+		if len(os.Args) > 3 && os.Args[3] == "-p" {
+			print(testName)
+			return
+		}
+		util.ExecGoTest(testName, os.Args[3:]...)
+
+	// interactive
+	default:
+		testName, done = interactiveMode()
+		if done {
+			return
+		}
+		if len(os.Args) > 1 && os.Args[1] == "-p" {
+			print(testName)
+			return
+		}
+		util.ExecGoTest(testName, os.Args[1:]...)
+	}
+}
+
+func helpMode() {
+	log.Println("Use --pos to pass an uri with absolute filepath to exec the closest test\n" +
+		"\tNOTE: this flag must be the first arg if you try to use it!!!\n" +
+		"\tFor example: \n" +
+		"\t\t'gott --pos /Users/sshelll/go/src/gott/xxx_test.go:59'\n" +
+		"\t\tIn this way, gott would try to exec the closest go test func to the uri with no flags\n" +
+		"\t\t'gott --pos /Users/sshelll/go/src/gott/xxx_test.go:59 -p'\n" +
+		"\t\tIn this way, gott would print the closest test name of the uri\n" +
+		"\t\t'gott --pos /Users/sshelll/go/src/gott/xxx_test.go:59 -v'\n" +
+		"\t\tIn this way, gott would try to exec the closest test name of the uri with -v flag\n" +
+		"\nUse -p to print the go test name instead of exec it\n" +
+		"\tNOTE: This flag must be the first arg or the third arg if you try to use it!!!\n" +
+		"\tFor example: \n" +
+		"\t\t'gott -p'\n" +
+		"\t\tIn this way, gott would print the test name with interactive mode\n" +
+		"\t\t'gott --pos xxx_test.go:59 -p'\n" +
+		"\t\tIn this way, gott would print the closest test name of the uri\n" +
+		"\t\tPlease note that if you want to use --pos and -p together, you should put the --pos in the first, uri in the sec, and -p is the third\n" +
+		"\nOtherwise you will exec go test with interactive mode, and other args will be passed to 'go test'\n" +
+		"\tFor example: \n" +
+		"\t\t'gott' equals 'go test'\n" +
+		"\t\t'gott -v equals 'go test -v'\n" +
+		"\t\t'gott -v -count=1' equals 'go test -v -count=1'\n" +
+		"Thanks")
+}
+
+func interactiveMode() (testName string, done bool) {
 	f, ok := util.ChooseTestFile()
 	if !ok {
-		println("[gott] no files were chosen, exit...")
-		return
+		log.Println("[gott] no files were chosen, exit...")
+		return "", true
 	}
 
 	fInfo, err := ast.Parse(f)
@@ -34,72 +92,47 @@ func main() {
 	testList := append(goTests, testifyTests...)
 
 	if len(testList) == 0 {
-		println("[gott] no tests were found, exit...")
-		return
+		log.Println("[gott] no tests were found, exit...")
+		return "", true
 	}
 
 	testName, testAll, ok := util.ChooseTest(testList)
 	if !ok {
-		println("[gott] no tests were chosen, exit...")
-		return
+		log.Println("[gott] no tests were chosen, exit...")
+		return "", true
 	}
 
 	if testAll {
-		testName = buildTestAllExpr(goTests)
+		testName = util.BuildTestAllExpr(goTests)
 	}
 
-	if len(os.Args) > 1 && os.Args[1] == "-p" {
-		fmt.Print(testName)
-		return
-	}
-
-	execGoTest(testName)
-
+	return
 }
 
-func buildTestAllExpr(testList []string) string {
-
-	buf := strings.Builder{}
-	cnt := len(testList)
-
-	for i, testName := range testList {
-		buf.WriteString("^")
-		buf.WriteString(testName)
-		buf.WriteString("$")
-		if i < cnt-1 {
-			buf.WriteString("\\|")
-		}
+func posMode() (testName string, done bool) {
+	if len(os.Args) < 3 {
+		log.Println("[gott] no uri was passed, exit...")
+		return "", true
 	}
 
-	return buf.String()
-
-}
-
-func execGoTest(testName string) {
-
-	args := bytes.Buffer{}
-	if len(os.Args) > 1 {
-		for i := 1; i < len(os.Args); i++ {
-			args.WriteString(os.Args[i])
-			args.WriteString(" ")
-		}
+	uri := os.Args[2]
+	f, pos, err := util.ParseURI(uri)
+	if err != nil {
+		log.Fatalln(err.Error())
 	}
 
-	goTestCmd := fmt.Sprintf("go test %s -test.run %s", args.String(), testName)
-	execCmd(goTestCmd, true)
-
-}
-
-func execCmd(sh string, useStdIO bool) {
-
-	cmd := exec.Command("bash", "-c", sh)
-	if useStdIO {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+	fInfo, err := ast.Parse(f)
+	if err != nil {
+		log.Fatalln("[gott] ast parse failed:", err.Error())
 	}
 
-	if err := cmd.Run(); err != nil {
-		log.Fatalf("[gott] exec cmd '%s' failed, err = %v\n", cmd.String(), err)
+	testName, ok := util.FindClosestTestFunc(fInfo, pos)
+	if !ok {
+		log.Println("[gott] no tests were found, exit...")
+		return "", true
 	}
 
+	testName = fmt.Sprintf("^%s$", testName)
+
+	return
 }
