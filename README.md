@@ -7,7 +7,7 @@ Go test tool with terminal UI.
 
 ## Demo
 
-<img src="gif/demo.gif" alt="demo" width=50%>
+<img src="/gif/demo.gif" alt="demo" width=50%>
 
 ## Install
 
