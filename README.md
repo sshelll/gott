@@ -21,6 +21,8 @@ go version <= 1.16, go to Release page and download the executable file(MacOS On
 
 ## Usage
 
+**Use `gott -h` to get more details**
+
 **Use `gott` instead of `go test`**
 
 Or you can exec `gott -p` to get the test name, in this way you won't run `go test`
