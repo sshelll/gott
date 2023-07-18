@@ -1,108 +1,105 @@
 package main
 
+// Copyright (c) 2023 sshelll, the gott authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can
+// be found in the LICENSE file.
+
 import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
-	"github.com/sshelll/gott/util"
+	"github.com/sshelll/fuckflag"
+	"github.com/sshelll/gott/core"
 	"github.com/sshelll/sinfra/ast"
 )
 
+const (
+	version = "v1.5.0"
+	website = "https://github.com/sshelll/gott"
+)
+
+var (
+	versionFlag = fuckflag.Bool("version", false, "print version of gott")
+
+	posFlag     = fuckflag.String("pos", "", "the uri with absolute filepath to exec the closest test\n\n"+
+		"[EXAMPLE 1]:\n\t'gott --pos=/Users/sshelll/go/src/xx_test.go:104'\n"+
+		"\tthis will exec the closest test to the 104(byte pos) in the file xx_test.go\n\n"+
+		"[EXAMPLE 2]:\n\t'gott --pos=/Users/sshelll/go/src/xx_test.go:235 -v -race'\n"+
+		"\tthis will exec the closest test to the 235(byte pos) in the file xx_test.go with -v -race flags\n",
+	)
+	
+	runFileFlag = fuckflag.String("runFile", "", "the uri with absolute filepath to exec all test in the file\n"+
+		"[EXAMPLE 1]:\n\t'gott --runFile=/Users/sshelll/go/src/xx_test.go'\n"+
+		"\tthis will exec all tests in 'xx_test.go'\n"+
+		"[EXAMPLE 2]:\n\t'gott --runFile=/Users/sshelll/go/src/xx_test.go -v -race'\n"+
+		"\tthis will exec all tests in 'xx_test.go' with -v -race flags\n",
+	)
+
+	pFlag = fuckflag.Bool("p", false, "print the test name instead of exec it\n\n"+
+		"[EXAMPLE 1]:\n\t'gott -p --pos=/Users/sshelll/go/src/xx_test.go:104'\n"+
+		"\tthis will print the test name instead of exec it\n\n"+
+		"[EXAMPLE 2]:\n\t'gott -p --runFile=/Users/sshelll/go/src/xx_test.go'\n"+
+		"\tthis will print name of all tests in the file instead of exec them\n",
+	)
+)
+
 func main() {
+	fuckflag.Usage = usage
+	fuckflag.Parse()
+	prechck()
+
+	var (
+		testName string
+		done     bool
+	)
+
 	switch true {
-	// help
-	case len(os.Args) == 2 && (os.Args[1] == "-h" || os.Args[1] == "--help"):
-		helpMode()
+	// version
+	case *versionFlag:
+		versionMode()
 		return
 
 	// pos
-	case len(os.Args) > 1 && os.Args[1] == "--pos":
-		testName, done := posMode()
-		if done {
-			return
-		}
-		if len(os.Args) > 3 && os.Args[3] == "-p" {
-			print(testName)
-			return
-		}
-		var args []string
-		if len(os.Args) > 3 {
-			args = os.Args[3:]
-		}
-		util.ExecGoTest(testName, args...)
+	case *posFlag != "":
+		testName, done = posMode()
 
 	// run file
-	case len(os.Args) > 1 && os.Args[1] == "--runFile":
-		testName, done := runFileMode()
-		if done {
-			return
-		}
-		if len(os.Args) > 3 && os.Args[3] == "-p" {
-			print(testName)
-			return
-		}
-		var args []string
-		if len(os.Args) > 3 {
-			args = os.Args[3:]
-		}
-		util.ExecGoTest(testName, args...)
+	case *runFileFlag != "":
+		testName, done = runFileMode()
 
 	// interactive
 	default:
-		testName, done := interactiveMode()
-		if done {
-			return
-		}
-		if len(os.Args) > 1 && os.Args[1] == "-p" {
-			print(testName)
-			return
-		}
-		var args []string
-		if len(os.Args) > 1 {
-			args = os.Args[1:]
-		}
-		util.ExecGoTest(testName, args...)
+		testName, done = interactiveMode()
+	}
+
+	if done {
+		return
+	}
+
+	if *pFlag {
+		print(testName)
+		return
+	}
+
+	if len(strings.TrimSpace(testName)) > 0 {
+		core.ExecGoTest(testName, fuckflag.Extends()...)
 	}
 }
 
-func helpMode() {
-	log.Println("Use --pos to pass an uri with absolute filepath to exec the closest test\n" +
-		"\tNOTE: this flag must be the first arg if you try to use it!!!\n" +
-		"\tFor example: \n" +
-		"\t\t'gott --pos /Users/sshelll/go/src/gott/xxx_test.go:59'\n" +
-		"\t\tIn this way, gott would try to exec the closest go test func to the uri with no flags\n" +
-		"\t\t'gott --pos /Users/sshelll/go/src/gott/xxx_test.go:59 -p'\n" +
-		"\t\tIn this way, gott would print the closest test name of the uri\n" +
-		"\t\t'gott --pos /Users/sshelll/go/src/gott/xxx_test.go:59 -v'\n" +
-		"\t\tIn this way, gott would try to exec the closest test name of the uri with -v flag\n" +
-		"\nUse -p to print the go test name instead of exec it\n" +
-		"\tNOTE: This flag must be the first arg or the third arg if you try to use it!!!\n" +
-		"\tFor example: \n" +
-		"\t\t'gott -p'\n" +
-		"\t\tIn this way, gott would print the test name with interactive mode\n" +
-		"\t\t'gott --pos xxx_test.go:59 -p'\n" +
-		"\t\tIn this way, gott would print the closest test name of the uri\n" +
-		"\t\tPlease note that if you want to use --pos and -p together, you should put the --pos in the first, uri in the sec, and -p is the third\n" +
-		"\t\t Use --runFile to exec all test in a file\n" +
-		"\t\tNOTE: this flag must be the first arg if you try to use it!!!\n" +
-		"\t\tFor example: \n" +
-		"\t\t'gott --runFile /Users/sshelll/go/src/gott/xxx_test.go'\n" +
-		"\t\tIn this way, gott would try to exec all test in the file\n" +
-		"\t\t'gott --runFile /Users/sshelll/go/src/gott/xxx_test.go -v'\n" +
-		"\t\tIn this way, gott would try to exec all test in the file with -v flag\n" +
-		"\t\t'gott --runFile /Users/sshelll/go/src/gott/xxx_test.go -p'\n" +
-		"\t\tIn this way, gott would print all test name in the file\n" +
-		"\nOtherwise you will exec go test with interactive mode, and other args will be passed to 'go test'\n" +
-		"\tFor example: \n" +
-		"\t\t'gott' equals 'go test'\n" +
-		"\t\t'gott -v equals 'go test -v'\n" +
-		"\t\t'gott -v -count=1' equals 'go test -v -count=1'\n" +
-		"Thanks")
+func prechck() {
+	if *runFileFlag != "" && *posFlag != "" {
+		log.Fatalln("[gott] -pos and -runFile flag cannot co-exist.")
+	}
+}
+
+func versionMode() {
+	println(fmt.Sprintf("gott version %s\nto get more detail please visit '%s'.", version, website))
 }
 
 func interactiveMode() (testName string, done bool) {
-	f, ok := util.ChooseTestFile()
+	f, ok := core.ChooseTestFile()
 	if !ok {
 		log.Println("[gott] no files were chosen, exit...")
 		return "", true
@@ -113,7 +110,7 @@ func interactiveMode() (testName string, done bool) {
 		log.Fatalln("[gott] ast parse failed:", err.Error())
 	}
 
-	goTests, testifyTests := util.ExtractTestFuncs(fInfo), util.ExtractTestifySuiteTestMethods(fInfo)
+	goTests, testifyTests := core.ExtractTestFuncs(fInfo), core.ExtractTestifySuiteTestMethods(fInfo)
 	testList := append(goTests, testifyTests...)
 
 	if len(testList) == 0 {
@@ -121,27 +118,23 @@ func interactiveMode() (testName string, done bool) {
 		return "", true
 	}
 
-	testName, testAll, ok := util.ChooseTest(testList)
+	testName, testAll, ok := core.ChooseTest(testList)
 	if !ok {
 		log.Println("[gott] no tests were chosen, exit...")
 		return "", true
 	}
 
 	if testAll {
-		testName = util.BuildTestAllExpr(goTests)
+		testName = core.BuildTestAllExpr(goTests)
 	}
 
 	return
 }
 
 func posMode() (testName string, done bool) {
-	if len(os.Args) < 3 {
-		log.Println("[gott] no uri was passed, exit...")
-		return "", true
-	}
+	uri := *posFlag
 
-	uri := os.Args[2]
-	f, pos, err := util.ParseURI(uri)
+	f, pos, err := core.ParseURI(uri)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -151,7 +144,7 @@ func posMode() (testName string, done bool) {
 		log.Fatalln("[gott] ast parse failed:", err.Error())
 	}
 
-	testName, ok := util.FindClosestTestFunc(fInfo, pos)
+	testName, ok := core.FindClosestTestFunc(fInfo, pos)
 	if !ok {
 		log.Println("[gott] no tests were found, exit...")
 		return "", true
@@ -163,19 +156,39 @@ func posMode() (testName string, done bool) {
 }
 
 func runFileMode() (testName string, done bool) {
-	f := os.Args[2]
+	f := *runFileFlag
 	fInfo, err := ast.Parse(f)
 	if err != nil {
 		log.Fatalln("[gott] ast parse failed:", err.Error())
 	}
 
-	goTests := util.ExtractTestFuncs(fInfo)
+	goTests := core.ExtractTestFuncs(fInfo)
 
 	if len(goTests) == 0 {
 		log.Println("[gott] no tests were found, exit...")
 		return "", true
 	}
 
-	testName = util.BuildTestAllExpr(goTests)
+	testName = core.BuildTestAllExpr(goTests)
 	return
+}
+
+func usage() {
+	fmt.Fprintf(os.Stderr, "Gott is a alternative to 'go test' command, it can help you to choose a specific test to run with UI.\n")
+	fmt.Fprintf(os.Stderr, "Also, it has some useful features, such as:\n \t-find the closest test func by byte pos\n\t-find all tests in a go test file\n\n")
+	fmt.Fprintf(os.Stderr, "If you want to use it as a command line tool, just try 'gott [go test args]' in your terminal, for example:\n")
+	fmt.Fprintf(os.Stderr, "\tgott -v ==> go test -v\n")
+	fmt.Fprintf(os.Stderr, "\tgott -race ==> go test -race\n")
+	fmt.Fprintf(os.Stderr, "\tgott -v -race ==> go test -v -race\n\n")
+	fmt.Fprintf(os.Stderr, "If you want to use it as a binary tool to help get a test name, just try 'gott -p [other flags]' in your terminal, for example:\n")
+	fmt.Fprintf(os.Stderr, "\tgott -p --pos=/Users/sshelll/go/src/xx_test.go:235 ==> print the closest test to the 235(byte pos) in the file xx_test.go\n")
+	fmt.Fprintf(os.Stderr, "\tgott -p --runFile=/Users/sshelll/go/src/xx_test.go ==> print all tests in the file xx_test.go\n\n")
+	fmt.Fprintf(os.Stderr, "TIPS: the result of 'gott -p' is a regexp test name, you can use it with 'go test' or 'dlv' command, for example:\n")
+	fmt.Fprintf(os.Stderr, "\tgo test -v -test.run $(gott -p --pos=/Users/sshelll/go/src/xx_test.go:235)\n")
+	fmt.Fprintf(os.Stderr, "\tdlv test --build-flags=-test.run $(gott -p --pos=/Users/sshelll/go/src/xx_test.go:235)\n\n")
+	fmt.Fprintf(os.Stderr, "WARN: The work dir of gott should be a go package dir, otherwise it will not work.\n")
+	fmt.Fprintf(os.Stderr, "Also, although gott is a alternative command to 'go test', 'go' is still required.\n\n")
+	fmt.Fprintf(os.Stderr, "For more detail please visit '%s'. Have fun with gott!\n\n", website)
+	fmt.Fprintf(os.Stderr, "Usage of Gott:\n")
+	fuckflag.PrintDefaults()
 }

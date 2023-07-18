@@ -44,6 +44,8 @@ github.com/rivo/uniseg v0.4.3/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUc
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
 github.com/rogpeppe/go-internal v1.8.0 h1:FCbCCtXNOY3UtUuHUYaghJg4y7Fd14rXifAYUAtL9R8=
 github.com/rogpeppe/go-internal v1.8.0/go.mod h1:WmiCO8CzOY8rg0OYDC4/i/2WRWAB6poM+XZ2dLUbcbE=
+github.com/sshelll/fuckflag v0.0.1 h1:vtVgpxkAdCj5110H8D9EfcgmTMNBpGpqV1sMcrxwSx8=
+github.com/sshelll/fuckflag v0.0.1/go.mod h1:0VNJAxfei0oqGHfbvOFqcpFJZCvQjXrPwKT3VKDrJb4=
 github.com/sshelll/menuscreen v1.0.11 h1:H8quGmgucVEBwvcs1wkTXAIanPZsHObVbVlrk9+z+iA=
 github.com/sshelll/menuscreen v1.0.11/go.mod h1:YM/BFtRpb8qtJBv1gy0RBgwEMm7HvEeDStRT2YqKoNI=
 github.com/sshelll/sinfra v0.0.0-20230105131211-5b1902ccbc20 h1:Q6e6K36gh53XDg0VTvmx+Q1CPtmj9JGCI9efGW5u3xo=
