@@ -9,7 +9,7 @@ Go test tool with terminal UI.
 
 <img src="/gif/demo.gif" alt="demo" width=50%>
 
-## Install
+## 1.Install
 
 go version >= 1.17, clone this repo and exec `go build .` should be ok，or you can exec the command below：
 
@@ -19,9 +19,7 @@ go install github.com/sshelll/gott@latest
 
 go version <= 1.16, go to Release page and download the executable file(MacOS Only, I'm lazy...)
 
-## Usage
-
-**Use `gott -h` to get more details**
+## 2.Usage
 
 **Use `gott` instead of `go test`**
 
@@ -35,7 +33,7 @@ For example:
 
 `go test -gcflags="all=-l -N"` => `gott -gcflags=\"all=-l -N\"`
 
-`go test -gcflags=all=-l -race -coverprofile=coverage.out` => `gott -gcflags=all=-l -race -coverprofile=coverage.out`
+`go test -gcflags=all=-l -race -coverprofile=coverage.out` => `gott \"all=-l -N\" -race -coverprofile=coverage.out`
 
 `gott -p` => `you will get a go test func name`
 
@@ -51,7 +49,9 @@ if [ ! $fn ]; then exit 0; fi
 dlv test --build-flags=-test.run $fn
 ```
 
-## QA
+**Use `gott -h` to get more details**
+
+## 3.QA
 
 - Q1：Does this program recognize `github.com/stretchr/testify/suite` ？
 
