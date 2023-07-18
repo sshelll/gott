@@ -1,0 +1,98 @@
+Gott is a alternative to 'go test' command, it can help you to choose a specific test to run
+with UI.
+
+Also, it has some useful features, such as:
+        -find the closest test func by byte pos
+        -find all tests in a go test file
+
+If you want to use it as a command line tool, just try 'gott [go test args]' in your terminal,
+ for example:
+        gott -v ==> go test -v
+        gott -race ==> go test -race
+        gott -v -race ==> go test -v -race
+
+If you want to use it as a binary tool to help get a test name, just try
+'gott -p [other flags]' in your terminal, for example:
+        gott -p --pos=/Users/sshelll/go/src/xx_test.go:235 ==> print the closest
+        test to the 235(byte pos) in the file xx_test.go
+        gott -p --runFile=/Users/sshelll/go/src/xx_test.go ==> print all tests
+        in the file xx_test.go
+
+TIPS: the result of 'gott -p' is a regexp test name, you can use it with
+'go test' or 'dlv' command, for example:
+        go test -v -test.run $(gott -p --pos=/Users/sshelll/go/src/xx_test.go:235)
+        dlv test --build-flags=-test.run $(gott -p --pos=/Users/sshelll/go/src/xx_test.go:235)
+
+WARN: The work dir of gott should be a go package dir, otherwise it will not work.
+Also, although gott is a alternative command to 'go test', 'go' is still required.
+
+For more detail please visit 'https://github.com/sshelll/gott'. Have fun with gott!
+
+----------------------------------------------------------------------------------------------
+
+Usage of Gott:
+  -listAll
+        print all tests of a file, this flag shoule be used with '-runFile'
+
+        NOTE: the difference between '-listAll' and '-p' is that '-p' will not print 'testify test methods'
+        For Example, if you got a test file like this:
+
+        // package test
+        //
+        // import (
+        //      "testing"
+        //      "github.com/stretchr/testify/suite"
+        // )
+        //
+        // func TestXxx(t *testing.T) {
+        //      println("hello world")
+        // }
+        //
+        // type FooTestSuite struct {
+        //      suite.Suite
+        // }
+        //
+        // func TestFoo(t *testing.T) {
+        //      testifySuite.Run(t, &FooTestSuite{})
+        // }
+        //
+        // func (*FooTestSuite) TestCase() {
+        //
+        // }
+
+        The -p flag will only print 'TestXXX' and 'TestFoo' for you,
+        while -listAll will print both of them and 'TestFoo/TestCase'.
+
+  -p    print the test name instead of exec it
+
+        [EXAMPLE 1]:
+                'gott -p --pos=/Users/sshelll/go/src/xx_test.go:104'
+                this will print the test name instead of exec it
+
+        [EXAMPLE 2]:
+                'gott -p --runFile=/Users/sshelll/go/src/xx_test.go'
+                this will print name of all tests in the file instead of exec them
+
+  -pos string
+        the uri with absolute filepath to exec the closest test
+
+        [EXAMPLE 1]:
+                'gott --pos=/Users/sshelll/go/src/xx_test.go:104'
+                this will exec the closest test to the 104(byte pos) in the file xx_test.go
+
+        [EXAMPLE 2]:
+                'gott --pos=/Users/sshelll/go/src/xx_test.go:235 -v -race'
+                this will exec the closest test to the 235(byte pos) in the file xx_test.go with -v -race flags
+
+  -runFile string
+        the uri with absolute filepath to exec all test in the file
+
+        [EXAMPLE 1]:
+                'gott --runFile=/Users/sshelll/go/src/xx_test.go'
+                this will exec all tests in 'xx_test.go'
+        [EXAMPLE 2]:
+                'gott --runFile=/Users/sshelll/go/src/xx_test.go -v -race'
+                this will exec all tests in 'xx_test.go' with -v -race flags
+
+  -version
+        print version of gott
