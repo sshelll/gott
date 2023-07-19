@@ -1,0 +1,92 @@
+package core
+
+// Copyright (c) 2023 sshelll, the gott authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can
+// be found in the LICENSE file.
+
+// This is a test file for testing gott.
+
+import (
+	"context"
+	"fmt"
+	"testing"
+
+	testifySuite "github.com/stretchr/testify/suite"
+)
+
+type DummyInt int
+
+func (d DummyInt) IntVal() int {
+	return int(d)
+}
+
+func (d DummyInt) String() string {
+	return fmt.Sprintf("%d", d)
+}
+
+func TestXxx(t *testing.T) {
+	println("hello world")
+}
+
+type FooTestSuite struct {
+	testifySuite.Suite
+	Ctx context.Context
+	BarTestSuite
+}
+
+func TestFoo(t *testing.T) {
+	testifySuite.Run(t, &FooTestSuite{})
+}
+
+func (s *FooTestSuite) BeforeTest(suiteName, testName string) {
+	s.T().Logf("FOO BEFORE TEST - [%s-%s]", suiteName, testName)
+}
+
+func (s *FooTestSuite) TestCase() {
+	s.T().Log("this is FooTestSuite.TestCase")
+}
+
+func (s FooTestSuite) TestCase3() {
+	s.T().Log("this is FooTestSuite.TestCase3")
+}
+
+type BarTestSuite struct {
+	testifySuite.Suite
+	Ctx    context.Context
+	S1, S2 string
+}
+
+func TestBar(t *testing.T) {
+	// gott is not smart enough to recognize this kind of code...
+	// you have to use call Run() directly, for example:
+	// testifySuite.Run(t, &BarTestSuite{})
+	// testifySuite.Run(t, new(BarTestSuite))
+	tt := new(BarTestSuite)
+	testifySuite.Run(t, tt)
+}
+
+func (s *BarTestSuite) BeforeTest(suiteName, testName string) {
+	s.T().Logf("BAR BEFORE TEST - [%s-%s]", suiteName, testName)
+}
+
+func (s *BarTestSuite) TestCase1() {
+	if s.T() == nil {
+		return
+	}
+	s.T().Log("this is BarTestSuite.TestCase1")
+}
+
+func (s *BarTestSuite) TestCase2() {
+	if s.T() == nil {
+		return
+	}
+	s.T().Log("this is BarTestSuite.TestCase2")
+}
+
+func (*BarTestSuite) OtherFunc() {
+
+}
+
+func (*BarTestSuite) privateFunc() {
+
+}
