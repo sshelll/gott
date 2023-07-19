@@ -16,17 +16,35 @@ const (
 	website = "https://github.com/sshelll/gott"
 )
 
-var (
-	versionFlag = fuckflag.Bool("version", false, "print version of gott\n")
+const (
+	versionFlagName = "version"
+	posFlagName     = "pos"
+	fileFlagName    = "file"
+	printFlagName   = "print"
+	subFlagName     = "sub"
+)
 
-	posFlag = fuckflag.String("pos", "", "byte pos of a test file, this flag should be used with '-file'\n\n"+
+var (
+	posIsSet     bool
+	subIsSet     bool
+	fileIsSet    bool
+	printIsSet   bool
+	versionIsSet bool
+)
+
+var (
+	versionFlag = fuckflag.Bool(versionFlagName, false, "print version of gott\n"+
+	"NOTE: please use 'gott -version' or 'gott --version', 'gott -v' will be treated as 'go test -v'\n",
+	)
+
+	posFlag = fuckflag.String(posFlagName, "", "byte pos of a test file, this flag should be used with '-file'\n\n"+
 		"[EXAMPLE 1]:\n\t'gott -pos=104 -file=/Users/sshelll/go/src/xx_test.go'\n"+
 		"\tthis will exec the closest test to the 104(byte pos) in the file xx_test.go\n\n"+
 		"[EXAMPLE 2]:\n\t'gott -pos=235 -file=/Users/sshelll/go/src/xx_test.go -v -race'\n"+
 		"\tthis will exec the closest test to the 235(byte pos) in the file xx_test.go\nwith -v -race flags\n",
 	)
 
-	fileFlag = fuckflag.String("file", "", "filepath of a go test file\n\n"+
+	fileFlag = fuckflag.String(fileFlagName, "", "filepath of a go test file\n\n"+
 		"NOTE: if the path is not start with '/', then the final file path would be './file'\n\n"+
 		"[EXAMPLE 1]:\n\t'gott -file=/Users/sshelll/go/src/xx_test.go'\n"+
 		"\tthis will exec all tests in the file\n"+
@@ -34,14 +52,14 @@ var (
 		"\tthis will exec all tests in './xx_test.go' with -v -race flags\n",
 	)
 
-	printFlag = fuckflag.Bool("print", false, "print the result instead of exec\n\n"+
+	printFlag = fuckflag.Bool(printFlagName, false, "print the result instead of exec\n\n"+
 		"[EXAMPLE 1]:\n\t'gott -print -pos=104 -file=xx_test.go'\n"+
 		"\tthis will print the closest test name instead of exec it\n\n"+
 		"[EXAMPLE 2]:\n\t'gott -print -file=xx_test.go'\n"+
 		"\tthis will print name of all tests in the file instead of exec them\n",
 	)
 
-	subFlag = fuckflag.Bool("sub", false, "get all tests of a file(including sub-tests), this flag must be used\n"+
+	subFlag = fuckflag.Bool(subFlagName, false, "get all tests of a file(including sub-tests), this flag must be used\n"+
 		"with '-print' and '-file'\n\n"+
 		"For Example, if you got a test file like this:\n"+
 		`
@@ -75,15 +93,15 @@ var (
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "Gott is a alternative to 'go test' command, it can help you to choose a specific test to run\nwith UI.\n\n")
-	fmt.Fprintf(os.Stderr, "Also, it has some useful features, such as:\n \t-find the closest test func by byte pos\n\t-find all tests in a go test file\n\n")
-	fmt.Fprintf(os.Stderr, "If you want to use it as a interactive test runner with UI, just try 'gott [go test args]'!\nFor example:\n")
-	fmt.Fprintf(os.Stderr, "\tgott -v ==> go test -v\n")
-	fmt.Fprintf(os.Stderr, "\tgott -race ==> go test -race\n")
-	fmt.Fprintf(os.Stderr, "\tgott -v -race ==> go test -v -race\n\n")
-	fmt.Fprintf(os.Stderr, "If you want to use it to find / exec tests without UI, I mean if you wish to treat it\nlike 'github.com/josharian/impl', please check the Usage below.\n\n")
-	fmt.Fprintf(os.Stderr, "For more detail please visit '%s'. Have fun with gott!\n\n", website)
-	fmt.Fprintf(os.Stderr, "----------------------------------------------------------------------------------------------\n\n")
-	fmt.Fprintf(os.Stderr, "Usage of Gott:\n")
+	fmt.Fprintf(os.Stdout, "Gott is a alternative to 'go test' command, it can help you to choose a specific test to run\nwith UI.\n\n")
+	fmt.Fprintf(os.Stdout, "Also, it has some useful features, such as:\n \t-find the closest test func by byte pos\n\t-find all tests in a go test file\n\n")
+	fmt.Fprintf(os.Stdout, "If you want to use it as a interactive test runner with UI, just try 'gott [go test args]'!\nFor example:\n")
+	fmt.Fprintf(os.Stdout, "\tgott -v ==> go test -v\n")
+	fmt.Fprintf(os.Stdout, "\tgott -race ==> go test -race\n")
+	fmt.Fprintf(os.Stdout, "\tgott -v -race ==> go test -v -race\n\n")
+	fmt.Fprintf(os.Stdout, "If you want to use it to find / exec tests without UI, I mean if you wish to treat it\nlike 'github.com/josharian/impl', please check the Usage below.\n\n")
+	fmt.Fprintf(os.Stdout, "For more detail please visit '%s'. Have fun with gott!\n\n", website)
+	fmt.Fprintf(os.Stdout, "----------------------------------------------------------------------------------------------\n\n")
+	fmt.Fprintf(os.Stdout, "Usage of Gott:\n")
 	fuckflag.PrintDefaults()
 }

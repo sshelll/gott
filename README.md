@@ -3,13 +3,35 @@
 <a href="https://996.icu"><img src="https://img.shields.io/badge/link-996.icu-red.svg" alt="996.icu" /></a>
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 
-Go test tool with terminal UI.
+> Go test tool with terminal UI.
 
-## Demo
+
+
+## NEWS
+
+<u>Gott v2 is published!</u>
+
+<u>Now You can use gott to parse go test files and get the test name from the gott output instead of exec it!</u>
+
+**For example:**
+
+`go test -v -test.run $(gott -print -file=/aa/bb/xx_test.go)`
+
+Please check `v2/help.txt` for more information.
+
+Use `go install github.com/sshelll/gott@v2.x.x ` to get it!
+
+---
+
+
+
+## gott@v1.x.x
+
+### Demo
 
 <img src="/gif/demo.gif" alt="demo" width=50%>
 
-## 1.Install
+### 1.Install
 
 go version >= 1.17, clone this repo and exec `go build .` should be ok，or you can exec the command below：
 
@@ -19,7 +41,7 @@ go install github.com/sshelll/gott@latest
 
 go version <= 1.16, go to Release page and download the executable file(MacOS Only, I'm lazy...)
 
-## 2.Usage
+### 2.Usage
 
 **Use `gott` instead of `go test`**
 
@@ -51,7 +73,7 @@ dlv test --build-flags=-test.run $fn
 
 **Use `gott -h` to get more details**
 
-## 3.QA
+### 3.QA
 
 - Q1：Does this program recognize `github.com/stretchr/testify/suite` ？
 

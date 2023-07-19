@@ -3,7 +3,7 @@ module github.com/sshelll/gott/v2
 go 1.19
 
 require (
-	github.com/sshelll/fuckflag v0.0.1
+	github.com/sshelll/fuckflag v0.0.2
 	github.com/sshelll/menuscreen v1.0.11
 	github.com/sshelll/sinfra v0.0.0-20230709100926-c585857ffb74
 	github.com/stretchr/testify v1.8.1

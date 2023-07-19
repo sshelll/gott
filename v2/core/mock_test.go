@@ -42,12 +42,12 @@ func (s *FooTestSuite) BeforeTest(suiteName, testName string) {
 	s.T().Logf("FOO BEFORE TEST - [%s-%s]", suiteName, testName)
 }
 
-func (*FooTestSuite) TestCase() {
-
+func (s *FooTestSuite) TestCase() {
+	s.T().Log("this is FooTestSuite.TestCase")
 }
 
-func (FooTestSuite) TestCase2() {
-
+func (s FooTestSuite) TestCase3() {
+	s.T().Log("this is FooTestSuite.TestCase3")
 }
 
 type BarTestSuite struct {
@@ -69,12 +69,18 @@ func (s *BarTestSuite) BeforeTest(suiteName, testName string) {
 	s.T().Logf("BAR BEFORE TEST - [%s-%s]", suiteName, testName)
 }
 
-func (*BarTestSuite) TestCase1() {
-
+func (s *BarTestSuite) TestCase1() {
+	if s.T() == nil {
+		return
+	}
+	s.T().Log("this is BarTestSuite.TestCase1")
 }
 
-func (*BarTestSuite) TestCase2() {
-
+func (s *BarTestSuite) TestCase2() {
+	if s.T() == nil {
+		return
+	}
+	s.T().Log("this is BarTestSuite.TestCase2")
 }
 
 func (*BarTestSuite) OtherFunc() {

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/sshelll/fuckflag"
@@ -19,15 +20,14 @@ import (
 
 var (
 	uiMode     bool
-	goTestFile string
 	goTestArgs []string
 )
 
 func main() {
-	initialize()
+	workDir := initialize()
 
-	if *versionFlag {
-		fmt.Fprintf(os.Stderr, "gott@%s\nvisit '%s' for more detail.\n", version, website)
+	if versionIsSet && *versionFlag {
+		fmt.Fprintf(os.Stdout, "gott@%s\nvisit '%s' for more detail.\n", version, website)
 		return
 	}
 
@@ -43,43 +43,67 @@ func main() {
 	}
 
 	// exec
-	if err := core.ExecGoTest(goTestRegExpr, goTestArgs...); err != nil {
+	if err := core.ExecGoTest(workDir, goTestRegExpr, goTestArgs...); err != nil {
 		log.Fatalf("[gott] exec go test failed: %v\n", err)
 	}
 }
 
-func initialize() {
-	fuckflag.Usage = usage
-	fuckflag.Parse()
-	goTestArgs = fuckflag.Extends()
+func initialize() (workDir string) {
+	parseFlags()
 
-	failConds := []bool{
-		*posFlag != "" && *subFlag,                   // -sub with -pos is meaningless
-		*posFlag != "" && *fileFlag == "",            // -pos must be used with -file
-		*subFlag && (!*printFlag || *fileFlag == ""), // -sub must be used with -print and -file
+	type cond struct {
+		failed bool
+		errMsg string
 	}
 
-	for _, failed := range failConds {
-		if failed {
-			log.Fatalln("[gott] invalid flag combination, please use gott -h to get help.")
+	failConds := []cond{
+		{posIsSet && subIsSet, "-sub with -pos is meaningless"},
+		{posIsSet && !fileIsSet, "-pos must be used with -file"},
+		{subIsSet && (!printIsSet || !fileIsSet), "-sub must be used with -print and -file"},
+		{posIsSet && util.StrToInt(*posFlag) < 0, "-pos must be a positive integer"},
+		{fileIsSet && !strings.HasSuffix(*fileFlag, "_test.go"), "-file must be a go test file"},
+	}
+
+	for _, cond := range failConds {
+		if cond.failed {
+			log.Fatalf("[gott] invalid flag, %s\n", cond.errMsg)
 		}
 	}
 
-	uiMode = !*versionFlag && *posFlag == "" && *fileFlag == "" && !*subFlag
+	if fileIsSet {
+		f, err := os.Stat(*fileFlag)
+		if f == nil || err != nil {
+			log.Fatalf("[gott] invalid file path '%s'\n", *fileFlag)
+		}
+	}
+
+	workDir = "."
+	uiMode = !versionIsSet && !posIsSet && !fileIsSet && !subIsSet
 	if uiMode {
 		return
 	}
 
-	file := *fileFlag
-	if file == "" {
+	if !fileIsSet {
 		return
 	}
-	if !strings.HasSuffix(file, "_test.go") {
-		log.Fatalf("[gott] '%s' is not a go test file\n", file)
-	}
-	if f, err := os.Stat(*fileFlag); f == nil || err != nil {
-		log.Fatalf("[gott] invalid file path '%s'\n", *fileFlag)
-	}
+	return filepath.Dir(*fileFlag)
+}
+
+func parseFlags() {
+	// init fuckflag
+	fuckflag.Usage = usage
+	fuckflag.CommandLine.SetOutput(os.Stdout)
+
+	// parse flags
+	fuckflag.Parse()
+	goTestArgs = fuckflag.Extends()
+
+	// init set status
+	posIsSet = fuckflag.IsSet(posFlagName)
+	subIsSet = fuckflag.IsSet(subFlagName)
+	fileIsSet = fuckflag.IsSet(fileFlagName)
+	printIsSet = fuckflag.IsSet(printFlagName)
+	versionIsSet = fuckflag.IsSet(versionFlagName)
 }
 
 func calGoTestRegRxpr() string {
@@ -93,13 +117,13 @@ func calGoTestRegRxpr() string {
 	}
 
 	// file mode
-	if *posFlag == "" && !*subFlag {
+	if !posIsSet && !subIsSet {
 		testFuncs := core.ExtractTestFuncs(f)
 		return util.BuildGoTestRegExpr(testFuncs...)
 	}
 
 	// pos mode
-	if *posFlag != "" {
+	if posIsSet {
 		tf, found := core.FindClosestTestFunc(f, util.StrToInt(*posFlag))
 		if !found {
 			return ""
@@ -108,7 +132,7 @@ func calGoTestRegRxpr() string {
 	}
 
 	// sub mode
-	if *subFlag {
+	if subIsSet && *subFlag {
 		testFuncs := core.ExtractTestFuncs(f)
 		testifyMethods := core.ExtractTestifySuiteTestMethods(f)
 		return util.BuildGoTestRegExpr(append(testFuncs, testifyMethods...)...)

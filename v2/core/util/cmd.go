@@ -12,5 +12,5 @@ func BuildGoTestRegExpr(testList ...string) string {
 	if len(testList) == 0 {
 		return ""
 	}
-	return "^" + strings.Join(testList, "$|^") + "$"
+	return "^" + strings.Join(testList, "$\\|^") + "$"
 }

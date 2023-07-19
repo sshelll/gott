@@ -7,6 +7,7 @@ package core
 import (
 	"fmt"
 	"math"
+	"os"
 	"strings"
 
 	"github.com/sshelll/sinfra/ast"
@@ -18,9 +19,18 @@ const (
 	testifyPkgName = `github.com/stretchr/testify/suite`
 )
 
-func ExecGoTest(testName string, testArgs ...string) error {
-	args := strings.Join(testArgs, " ")
-	goTestCmd := fmt.Sprintf("go test %s -test.run %s", args, testName)
+func ExecGoTest(workDir string, testName string, testArgs ...string) error {
+	// change work dir
+	if len(strings.TrimSpace(workDir)) == 0 {
+		workDir = "."
+	}
+	if err := os.Chdir(workDir); err != nil {
+		return fmt.Errorf("change work dir to '%s' failed: %v", workDir, err)
+	}
+
+	// exec go test
+	goTestCmd := fmt.Sprintf("go test %s -test.run %s",
+		strings.Join(testArgs, " "), testName)
 	if err := sutil.ExecBashCmd(goTestCmd); err != nil {
 		return fmt.Errorf("command: '%s', err: '%v'", goTestCmd, err)
 	}

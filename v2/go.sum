@@ -17,8 +17,8 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.4.3 h1:utMvzDsuh3suAEnhH0RdHmoPbU648o6CvXxTx4SBMOw=
 github.com/rivo/uniseg v0.4.3/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
-github.com/sshelll/fuckflag v0.0.1 h1:vtVgpxkAdCj5110H8D9EfcgmTMNBpGpqV1sMcrxwSx8=
-github.com/sshelll/fuckflag v0.0.1/go.mod h1:0VNJAxfei0oqGHfbvOFqcpFJZCvQjXrPwKT3VKDrJb4=
+github.com/sshelll/fuckflag v0.0.2 h1:G8rgOczR+Klg/8/BkgTFdUxpqQlHSpV45jWUtJqjNtY=
+github.com/sshelll/fuckflag v0.0.2/go.mod h1:0VNJAxfei0oqGHfbvOFqcpFJZCvQjXrPwKT3VKDrJb4=
 github.com/sshelll/menuscreen v1.0.11 h1:H8quGmgucVEBwvcs1wkTXAIanPZsHObVbVlrk9+z+iA=
 github.com/sshelll/menuscreen v1.0.11/go.mod h1:YM/BFtRpb8qtJBv1gy0RBgwEMm7HvEeDStRT2YqKoNI=
 github.com/sshelll/sinfra v0.0.0-20230709100926-c585857ffb74 h1:9jg0udfkp2xCxRgu9qGTtyzZdXzBJAws7DsNODKdzAw=
