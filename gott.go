@@ -16,20 +16,20 @@ import (
 )
 
 const (
-	version = "v1.5.0"
+	version = "v1.4.2"
 	website = "https://github.com/sshelll/gott"
 )
 
 var (
 	versionFlag = fuckflag.Bool("version", false, "print version of gott")
 
-	posFlag     = fuckflag.String("pos", "", "the uri with absolute filepath to exec the closest test\n\n"+
+	posFlag = fuckflag.String("pos", "", "the uri with absolute filepath to exec the closest test\n\n"+
 		"[EXAMPLE 1]:\n\t'gott --pos=/Users/sshelll/go/src/xx_test.go:104'\n"+
 		"\tthis will exec the closest test to the 104(byte pos) in the file xx_test.go\n\n"+
 		"[EXAMPLE 2]:\n\t'gott --pos=/Users/sshelll/go/src/xx_test.go:235 -v -race'\n"+
 		"\tthis will exec the closest test to the 235(byte pos) in the file xx_test.go with -v -race flags\n",
 	)
-	
+
 	runFileFlag = fuckflag.String("runFile", "", "the uri with absolute filepath to exec all test in the file\n"+
 		"[EXAMPLE 1]:\n\t'gott --runFile=/Users/sshelll/go/src/xx_test.go'\n"+
 		"\tthis will exec all tests in 'xx_test.go'\n"+
