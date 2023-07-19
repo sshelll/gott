@@ -19,7 +19,7 @@
 
 Please check `v2/help.txt` for more information.
 
-Use `go install github.com/sshelll/gott@v2.x.x ` to get it!
+Use `go install github.com/sshelll/gott/v2@latest` to get it!
 
 ---
 
