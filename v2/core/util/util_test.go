@@ -13,6 +13,6 @@ import (
 func TestBuildGoTestRegExpr(t *testing.T) {
 	assert.Equal(t, "", BuildGoTestRegExpr())
 	assert.Equal(t, "^TestFoo$", BuildGoTestRegExpr("TestFoo"))
-	assert.Equal(t, "^TestFoo$|^TestBar$", BuildGoTestRegExpr("TestFoo", "TestBar"))
-	assert.Equal(t, "^TestFoo$|^TestBar$|^TestBaz$", BuildGoTestRegExpr("TestFoo", "TestBar", "TestBaz"))
+	assert.Equal(t, "^TestFoo$\\|^TestBar$", BuildGoTestRegExpr("TestFoo", "TestBar"))
+	assert.Equal(t, "^TestFoo$\\|^TestBar$\\|^TestBaz$", BuildGoTestRegExpr("TestFoo", "TestBar", "TestBaz"))
 }
