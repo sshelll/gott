@@ -29,7 +29,7 @@ Use `go install github.com/sshelll/gott/v2@latest` to get it!
 
 ### Demo
 
-<img src="/gif/demo.gif" alt="demo" width=50%>
+<img src="./gif/demo.gif" alt="demo" width=50%>
 
 ### 1.Install
 
