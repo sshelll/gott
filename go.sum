@@ -28,6 +28,8 @@ github.com/sshelll/fuckflag v0.0.1 h1:vtVgpxkAdCj5110H8D9EfcgmTMNBpGpqV1sMcrxwSx
 github.com/sshelll/fuckflag v0.0.1/go.mod h1:0VNJAxfei0oqGHfbvOFqcpFJZCvQjXrPwKT3VKDrJb4=
 github.com/sshelll/fzflib v1.0.1 h1:JgnMTTvhbR+wGyI64BnekpV0Dur/5ikgEgxZK67Atr4=
 github.com/sshelll/fzflib v1.0.1/go.mod h1:LzJkCcGTGhxC4bjkn2pSVVbuOR/EA6Qr+uR9QCsNCpY=
+github.com/sshelll/fzflib v1.0.3 h1:tDx0n6BvfvGsyo566xnD6IuQkQC0Oc7v+Xlzf1bLOVY=
+github.com/sshelll/fzflib v1.0.3/go.mod h1:LzJkCcGTGhxC4bjkn2pSVVbuOR/EA6Qr+uR9QCsNCpY=
 github.com/sshelll/menuscreen v1.2.0 h1:98Rf5qzhL0Q2HqdiaVtHf+p9wPU8OuBf6fSCFM4A5s8=
 github.com/sshelll/menuscreen v1.2.0/go.mod h1:FpgctNbjwGLJ372KHT51smO+QPQdCeTYc1WBLiK2slI=
 github.com/sshelll/sinfra v0.0.0-20230901081751-e5739b11c280 h1:LmxofkjTJAF7Uuq8HkDL7Ay2sY26op3J6uksOiKGNhY=
