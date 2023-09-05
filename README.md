@@ -110,4 +110,4 @@ dlv test --build-flags=-test.run $fn
 
 - Q2：What are the key mappings?
 
-  A2：`↑` `↓` to move cursor，`/` to search (just strings.Contains()），`esc` to quit。
+  A2：`↑` `↓` to move cursor，`/` to search (fzf-like, but only supports lowercase chars），`esc` to quit。
