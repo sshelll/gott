@@ -4,8 +4,8 @@ go 1.21.0
 
 require (
 	github.com/sshelll/fuckflag v0.0.2
-	github.com/sshelll/menuscreen v1.2.0
-	github.com/sshelll/sinfra v0.0.0-20230901081751-e5739b11c280
+	github.com/sshelll/menuscreen v1.2.4
+	github.com/sshelll/sinfra v0.0.0-20230921084954-5a6f365587c9
 	github.com/stretchr/testify v1.8.1
 )
 
@@ -21,7 +21,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
-	github.com/sshelll/fzflib v1.0.3 // indirect
+	github.com/sshelll/fzflib v1.0.5 // indirect
 	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/term v0.12.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
